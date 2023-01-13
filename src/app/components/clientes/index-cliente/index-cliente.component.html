@@ -1,72 +1,97 @@
 <app-sidebar></app-sidebar>
-<div class="border-bottom pt-5 mt-2 mb-5">
-  <h1 class="mt-2 mt-md-4 mb-3 pt-5">Clientes</h1>
-  <div class="d-flex flex-wrap flex-md-nowrap justify-content-between">
-    <p class="text-muted">Este módulo lista todos los clientes de la tienda.</p>
-    <p class="font-size-sm font-weight-medium pl-md-4"><a class="text-nowrap"
-        href="https://getbootstrap.com/docs/4.5/components/forms/" target="_blank" rel="noopener">Registrar nuevo<i
-          class="cxi-angle-right font-size-base align-middle ml-1"></i></a></p>
-  </div>
-</div>
 
-<div class="card box-shadow-sm">
-  <div class="card-header">
-    <h5 style="margin-bottom: 0px;">Filtro de clientes</h5>
-  </div>
-  <div class="card-header">
-    <form class="form-inline pt-2">
-      <label class="sr-only" for="inline-form-input-name">Nombres</label>
-      <input class="form-control mb-3 mr-sm-4" (keyup)="filtro('nombres')" name="filtro_nombre" [(ngModel)]="filtro_nombre" type="text" id="inline-form-input-name" placeholder="Nombres">
-      <label class="sr-only" for="inline-form-input-username">Correo</label>
-      <div class="input-group mb-3 mr-sm-4">
-        <div class="input-group-prepend">
-          <div class="input-group-text">@</div>
-        </div>
-        <input class="form-control" type="text" (keyup)="filtro('correo')" name="filtro_correo" [(ngModel)]="filtro_correo" id="inline-form-input-username" placeholder="Correo">
-      </div>
+<div class="main-content">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+          <div class="col-12 col-lg-10 col-xl-8">
 
-          </form>
-  </div>
-  <div class="card-body">
-    <div class="table-responsive">
-      <table class="table table-bordered">
-        <thead class="thead-dark">
-          <tr>
-            <th>#</th>
-            <th>Nombres</th>
-            <th>Apellidos</th>
-            <th>Email</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody *ngFor="let x of clientes| slice: (page-1)*pageSize: (page-1)*pageSize+pageSize; let indice = index">
-          <tr>
-            <td>{{indice+1}}</td>
-            <td>{{x.nombres}}</td>
-            <td>{{x.apellidos}}</td>
-            <td>{{x.email}}</td>
-            <td>
-              <div class="btn-group dropdown dropdown d-inline-block mb-3 me-2">
-                <button type="button" class="btn btn-outline-secondary btn-sm dropdown-toggle" data-toggle="dropdown"
-                  aria-haspopup="true" aria-expanded="false">
-                  Acciones
-                </button>
-                <div class="dropdown-menu">
-                  <a href="#" class="dropdown-item">Editar Cliente</a>
-                  <a href="#" class="dropdown-item">Eliminar Cliente</a>
-                </div>
+            <!-- Header -->
+            <div class="header mt-md-5">
+              <div class="header-body">
+                <div class="row align-items-center">
+                  <div class="col">
+
+                    <!-- Pretitle -->
+                    <h6 class="header-pretitle">
+                      Módulo
+                    </h6>
+
+                    <!-- Title -->
+                    <h1 class="header-title">
+                        Clientes
+                    </h1>
+
+                  </div>
+                </div> <!-- / .row -->
+      
               </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <div class="card-footer">
-    <ngb-pagination
-      [(page)]="page"
-      [pageSize]="pageSize"
-      [collectionSize]="clientes.length">
-    </ngb-pagination>
-  </div>
+            </div>
+
+            <!-- Alert -->
+
+
+            <!-- Card -->
+            <div class="card">
+              <div class="card-header">
+
+                <!-- Title -->
+                <h4 class="card-header-title">
+                  Mostrando todos tus clientes
+                </h4>
+
+              </div>
+              <div class="card-body">
+                <div class="input-group input-group-merge">
+                    <input type="text" class="form-control form-control-appended" (keyup)="filtrar_cliente()" placeholder="Buscar cliente" name="filtro" [(ngModel)]="filtro">
+                    <div class="input-group-append">
+                      <button class="btn btn-primary" (click)="filtrar_cliente()">
+                          Buscar
+                      </button>
+                    </div>
+                  </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-sm table-nowrap card-table">
+                  <thead>
+                    <tr>
+                      <th>Cliente</th>
+                      <th>Correo</th>
+                      <th>Telefono</th>
+                      <th>Opciones</th>
+                    </tr>
+                  </thead>
+                  <tbody class="font-size-base">
+                    <tr *ngFor="let item of clientes | slice: (page-1) * pageSize : (page-1) * pageSize + pageSize">
+                      <td>
+                        <a class="text-primary">{{item.nombres}} {{item.apellidos}}</a>
+                      </td>
+                      <td>
+                        {{item.email}}
+                      <td>
+                        <span *ngIf="item.telefono">{{item.telefono}}</span>
+                        <span *ngIf="!item.telefono">No registrado</span>
+                      </td>
+                      <td>
+                        <span class="badge badge-secondary" [routerLink]="['panel/clientes',item._id]">Outstanding</span>
+                      </td>
+                    </tr>
+                   
+                  </tbody>
+                </table>
+                
+              </div>
+
+            </div>
+                <ngb-pagination *ngIf="clientes.length >= 1"
+                        [(page)]="page"
+                        [pageSize]="pageSize"
+                        [maxSize]="10"
+                        [rotate]="true" [boundaryLinks]="true"
+                [collectionSize]="clientes.length"></ngb-pagination>
+  
+            <br>
+
+          </div>
+        </div> <!-- / .row -->
+      </div>
 </div>

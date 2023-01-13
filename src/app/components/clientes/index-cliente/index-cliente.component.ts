@@ -1,4 +1,5 @@
 import { Component, IterableDiffers, OnInit } from '@angular/core';
+import { AdminService } from 'src/app/services/admin.service';
 import { ClienteService } from 'src/app/services/cliente.service';
 
 @Component({
@@ -8,62 +9,35 @@ import { ClienteService } from 'src/app/services/cliente.service';
 })
 export class IndexClienteComponent implements OnInit {
   //Array de Clientes
-  public clientes:Array<any>=[]
-
-  public filtro_nombre = '';
-  public filtro_correo =''
-
+  public clientes :Array<any>= [];
+  public clientes_const  :Array<any>= [];
+  public token = localStorage.getItem('token');
   public page = 1;
-  public pageSize = 1;
-
+  public pageSize = 24;
+  public filtro = '';
   constructor(
     private _clienteService:ClienteService
   ) { }
 
   ngOnInit(): void {
-    this.init_Data();
-  }
-
-  init_Data(){
-    this._clienteService.listar_clientes_filtro_admin(null,null).subscribe(
+    this._clienteService.listar_clientes_tienda(this.token).subscribe(
       response=>{
-        this.clientes = response.data
-        console.log(this.clientes) 
-      },error=>{
-        console.log(error)
+       // console.log(response); 
+        this.clientes_const = response.data;
+        this.clientes= this.clientes_const;
       }
-    )
+    );
   }
 
-  filtro(tipo:any){
-    if(tipo == 'nombres'){
-      if(this.filtro_nombre){
-      this._clienteService.listar_clientes_filtro_admin(tipo,this.filtro_nombre).subscribe(
-        response=>{
-          this.clientes = response.data
-          console.log(this.clientes) 
-        },error=>{
-          console.log(error)
-        }
-      )}else{
-        this.init_Data()
-      }
-    }else if(tipo == 'correo'){
-      if(this.filtro_correo){
-        this._clienteService.listar_clientes_filtro_admin(tipo,this.filtro_correo).subscribe(
-          response=>{
-            this.clientes = response.data
-            console.log(this.clientes) 
-          },error=>{
-            console.log(error)
-          }
-        )
-      }else{
-        this.init_Data()
-      }
+  filtrar_cliente(){
+    if(this.filtro){
+      var term = new RegExp(this.filtro.toString().trim() , 'i');
+      this.clientes = this.clientes_const.filter(item=>term.test(item.nombres)||term.test(item.apellidos)||term.test(item.email)||term.test(item.dni)||term.test(item.telefono)||term.test(item._id));
+    }else{
+      this.clientes = this.clientes_const;
     }
-  
-    }
+  }
+
 
 
    

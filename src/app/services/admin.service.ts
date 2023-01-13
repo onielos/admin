@@ -20,6 +20,7 @@ export class AdminService {
     let header = new HttpHeaders().set('Content-Type', 'application/json');
     return this._http.post(this.url + 'login_admin', data, { headers: header })
   }
+  
 
   getToken() {
     return localStorage.getItem('token');

@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AdminService } from 'src/app/services/admin.service';
-declare var jQuery: any;
-declare var $: any
-declare var iziToast: any;
+import { AdminService } from '../../services/admin.service';
+declare var $:any;
+declare var iziToast:any;
 
 @Component({
   selector: 'app-login',
@@ -12,66 +11,91 @@ declare var iziToast: any;
 })
 export class LoginComponent implements OnInit {
 
-  public user: any = {}
-  public usuario: any={}
-  public token: string |null
+  public token : any = '';
+  public admin = {
+    email :'',
+    password: ''
+  }
 
   constructor(
-    private _adminService: AdminService,
-    private _router: Router
-  ) {
-      this.token = this._adminService.getToken()
+    private _adminService:AdminService,
+    private _router:Router
+  ) { 
+    this.token =localStorage.getItem('token');
   }
 
   ngOnInit(): void {
-      console.log(this.token)
-      if(this.token){
-        this._router.navigate(['/'])
-      }else{
-        //MANTENER EL COMPONENTE
-      }
+    $('body').addClass('align-items-center');
+    if(this.token){
+      this._router.navigate(['/clientes']);
+    }else{
+      //MANTENER EN EL COMPONENTE
+    }
   }
 
-  login(loginForm: any) {
-    if (loginForm.valid) {
-      console.log(this.user)
-      let data = {
-        email: this.user.email,
-        password: this.user.password
-      }
+  login(loginForm:any){
+    
+    if(loginForm.valid){
+      let email = loginForm.value.email;
+      let password = loginForm.value.password;
 
-      this._adminService.login_admin(data).subscribe(
-        response => {
-          if(response.data == undefined){
-            iziToast.error({
-              title: 'ERROR',
-              class: 'text-danger',
-              position: 'topCenter',
-              message: 'Credenciales incorrectas'
-            })
-          }else{
-            iziToast.success({
-              title: 'OK',
-              position: 'bottomCenter',
-              message: 'Credenciales correctas'
-            })
-            this.usuario=response.data
-            localStorage.setItem('token',response.token);
-            localStorage.setItem('_id',response.data._id)
-
-            this._router.navigate(['/'])
+      if(email == '' && password == ''){
+        iziToast.show({
+          title: 'ERROR DATA',
+          class:'iziToast-danger',
+          position: 'topRight',
+          message: 'Todos los campos son requeridos, vuelva a intentar.'
+        });
+      }else{
+        this._adminService.login_admin({email,password}).subscribe(
+          response =>{
+            console.log(response);
+            
+            if(response.data != null){
+              this.token = response.jwt;
+              localStorage.setItem('token',response.token);
+              localStorage.setItem('identity',response.data._id);
+              //localStorage.setItem('user_data',JSON.stringify(response.data));
+              this._router.navigate(['/clientes']);
+            }else{
+              iziToast.show({
+                  title: 'ERROR USER',
+                  class:'iziToast-danger',
+                  position: 'topRight',
+                  message: response.message
+              });
+            }
+            
+          },
+          error=>{
+            iziToast.show({
+                title: 'ERROR SERVER',
+                class:'iziToast-danger',
+                position: 'topRight',
+                message: 'Ocurrió un error en el servidor, intente mas nuevamente.'
+            });
           }
-          console.log(response)
-        }, error => {
-          console.log(error)
-        }
-      )
-    } else {
-     
-      
-
+        );
+      }
+    }else{
+      iziToast.show({
+          title: 'ERROR DATA',
+          class:'iziToast-danger',
+          position: 'topRight',
+          message: 'Complete correctamente el formulario.'
+      });
     }
+  }
 
+  view_password(){
+    let type = $('#password').attr('type');
+
+    if(type == 'text'){
+      $('#password').attr('type','password');
+      
+    }else if(type == 'password'){
+      $('#password').attr('type','text');
+    }
   }
 
 }
